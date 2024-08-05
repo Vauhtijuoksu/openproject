@@ -46,8 +46,25 @@ module Pages
       find(".gitlab-git-copy:not([disabled])", text: "Git")
     end
 
+    # def within_git_snippet_section(text, &block)
+    #   binding.pry
+    #   within(:xpath, "//div[contains(.,'#{text}')]") do
+    #     yield block
+    #   end
+    # end
+
+    # TODO: Fix translations for aria-labels on copy buttons, so I can select them by this!
+
+    def copy_button
+      find(".copy-button:not([disabled])")
+    end
+
     def git_actions_copy_branch_name_button
       find(".git-actions-menu .copy-button:not([disabled])", match: :first)
+    end
+
+    def git_actions_copy_commit_message_button
+      find(".git-actions-menu .copy-button:not([disabled])", match: :second)
     end
 
     def paste_clipboard_content
