@@ -114,7 +114,7 @@ module OpenProject::Storages
           OpenProject::Events::PROJECT_STORAGE_DESTROYED
         ].each do |event|
           OpenProject::Notifications.subscribe(event) do |payload|
-            if payload[:project_folder_mode].to_sym == :automatic
+            if payload[:project_folder_mode]&.to_sym == :automatic
               ::Storages::AutomaticallyManagedStorageSyncJob.debounce(payload[:storage])
               ::Storages::ManageStorageIntegrationsJob.disable_cron_job_if_needed
             end
