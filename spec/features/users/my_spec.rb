@@ -53,6 +53,10 @@ RSpec.describe "my", :js, :with_cuprite do
     expect(user.name).to eq "Foo Bar"
   end
 
+  def clipboard_text
+    page.evaluate_async_script('navigator.clipboard.readText().then(arguments[0])')
+  end
+
   before do
     login_as user
 
@@ -150,6 +154,8 @@ RSpec.describe "my", :js, :with_cuprite do
           within "#api-token-section" do
             expect(page).to have_test_selector("api-token-add", text: "API token")
             find_test_selector("api-token-add").click
+            binding.pry
+            expect(clipboard_text).to eql ""
           end
 
           expect(page).to have_test_selector("new-access-token-dialog")
@@ -160,6 +166,8 @@ RSpec.describe "my", :js, :with_cuprite do
 
           within("dialog#access-token-created-dialog") do
             expect(page).to have_content "The API token has been generated"
+            click_button "Copy token"
+
           end
           expect(page).to have_content("Testing Token")
 

@@ -67,9 +67,15 @@ See COPYRIGHT and LICENSE files for more details.
             footer.with_component(Primer::ButtonComponent.new(scheme: :primary, type: :submit, test_selector: "create-api-token-button")) do
               I18n.t("my.access_token.new_access_token_dialog_submit_button_text")
             end
+            footer.with_component(render(Primer::Beta::ClipboardCopyButton.new(id: "clipboard-button", aria: { label: "Label Bla" }, value: "TODO", scheme: :primary, label: "BLA"))) do
+              "Text inside block"
+            end
           end
         end
       end
     end
   end
 %>
+
+
+cef391e55731c1e0e6138e793cb082ceeea67926702227f2574d2ea3a2b07422
