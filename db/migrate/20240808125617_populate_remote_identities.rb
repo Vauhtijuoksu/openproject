@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) 2012-2024 the OpenProject GmbH
@@ -28,16 +26,30 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class CreateRemoteIdentities < ActiveRecord::Migration[7.1]
-  def change
-    create_table :remote_identities do |t|
-      t.references :user, index: true, foreign_key: true
-      t.references :oauth_client, index: true, foreign_key: true
+class PopulateRemoteIdentities < ActiveRecord::Migration[7.1]
+  def up
+    fields = %i[user_id oauth_client_id origin_user_id]
 
-      t.string :origin_user_id, null: false, index: true
+    OAuthClientToken.where.not(origin_user_id: nil)
+                    .select(:id, *fields)
+                    .find_in_batches do |batch|
+      identities = batch.map { |record| record.slice(*fields) }
 
-      t.timestamps
-      t.index %i[user_id oauth_client_id], unique: true
+      RemoteIdentity.insert_all(identities, unique_by: %i[user_id oauth_client_id])
     end
+
+    OAuthClientToken.update_all(origin_user_id: nil)
+  end
+
+  def down
+    RemoteIdentity.find_in_batches do |batch|
+      batch.each do |identity|
+        OAuthClientToken
+          .where(user: identity.user, oauth_client: identity.oauth_client)
+          .update_all(origin_user_id: identity.origin_user_id)
+      end
+    end
+
+    RemoteIdentity.delete_all
   end
 end
