@@ -45,8 +45,13 @@ See COPYRIGHT and LICENSE files for more details.
         footer.with_component(Primer::ButtonComponent.new(data: { 'close-dialog-id': id })) do
           I18n.t("button_close")
         end
+        footer.with_component(Primer::Beta::ClipboardCopy.new(value: @token_value, "aria-label": copy_button_text)) do |c|
+          render(Primer::Beta::Button.new(scheme: :primary)) do |button|
+            button.with_leading_visual_icon(icon: :copy)
+            copy_button_text
+          end
+        end
       end
     end
   end
 %>
-

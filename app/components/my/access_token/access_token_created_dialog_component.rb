@@ -60,6 +60,10 @@ module My
           ]
         )
       end
+
+      def copy_button_text
+        I18n.t("my.access_token.create_dialog.copy_button")
+      end
     end
   end
 end
