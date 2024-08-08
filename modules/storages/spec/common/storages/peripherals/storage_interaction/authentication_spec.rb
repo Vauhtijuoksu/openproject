@@ -140,6 +140,14 @@ RSpec.describe Storages::Peripherals::StorageInteraction::Authentication, :webmo
           expect(error.data.source)
             .to be(Storages::Peripherals::StorageInteraction::AuthenticationStrategies::OAuthUserToken)
         end
+
+        it "logs, retries once, raises exception if race condition happens" do
+          allow(Rails.logger).to receive(:error)
+          allow_any_instance_of(OAuthClientToken).to receive(:destroy).and_raise(ActiveRecord::StaleObjectError)
+
+          expect { described_class[auth_strategy].call(storage:, http_options:) { |http| make_request(http) } }.to raise_error(ActiveRecord::StaleObjectError)
+          expect(Rails.logger).to have_received(:error).with("#<ActiveRecord::StaleObjectError: Stale object error.> happend for User ##{user.id} #{user.name}").once
+        end
       end
 
       context "with invalid oauth access token", vcr: "auth/nextcloud/user_token_access_token_invalid" do
