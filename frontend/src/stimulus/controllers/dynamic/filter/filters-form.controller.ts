@@ -78,6 +78,24 @@ export default class FiltersFormController extends Controller {
   connect() {
     const urlParams = new URLSearchParams(window.location.search);
     this.displayFiltersValue = urlParams.has('filters');
+
+    this.simpleValueTargets.forEach((simpleValue) => {
+      simpleValue.addEventListener('change', this.sendForm.bind(this));
+    });
+
+    this.filterValueSelectTargets.forEach((filterValueSelect) => {
+      filterValueSelect.addEventListener('input', this.sendForm.bind(this));
+    });
+  }
+
+  disconnect() {
+    this.simpleValueTargets.forEach((simpleValue) => {
+      simpleValue.removeEventListener('change', this.sendForm.bind(this));
+    });
+
+    this.filterValueSelectTargets.forEach((filterValueSelect) => {
+      filterValueSelect.removeEventListener('input', this.sendForm.bind(this));
+    });
   }
 
   toggleDisplayFilters() {
@@ -87,6 +105,10 @@ export default class FiltersFormController extends Controller {
   displayFiltersValueChanged() {
     this.toggleButtonActive();
     this.toggleFilterFormVisible();
+  }
+
+  detectChange() {
+    debugger;
   }
 
   toggleButtonActive() {
@@ -102,6 +124,7 @@ export default class FiltersFormController extends Controller {
   }
 
   toggleMultiSelect({ params: { filterName } }:{ params:{ filterName:string } }) {
+    console.log('Toggled!!!');
     const valueContainer = this.filterValueContainerTargets.find((filterValueContainer) => filterValueContainer.getAttribute('data-filter-name') === filterName);
     const singleSelect = this.filterValueSelectTargets.find((selectField) => !selectField.multiple && selectField.getAttribute('data-filter-name') === filterName);
     const multiSelect = this.filterValueSelectTargets.find((selectField) => selectField.multiple && selectField.getAttribute('data-filter-name') === filterName);
@@ -125,6 +148,8 @@ export default class FiltersFormController extends Controller {
     Array.from(selectElement.options).forEach((option) => {
       option.selected = option.value === selectedValue;
     });
+
+    this.sendForm();
   }
 
   addFilter(event:Event) {
@@ -136,6 +161,8 @@ export default class FiltersFormController extends Controller {
     this.disableSelection();
     this.reselectPlaceholderOption();
     this.setSpacerVisibility();
+
+    this.sendForm();
   }
 
   private disableSelection() {
@@ -154,6 +181,8 @@ export default class FiltersFormController extends Controller {
     const removedFilterOption = selectOptions.find((option) => option.value === filterName);
     removedFilterOption?.removeAttribute('disabled');
     this.setSpacerVisibility();
+
+    this.sendForm();
   }
 
   private setSpacerVisibility() {
