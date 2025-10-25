@@ -54,15 +54,18 @@ class EnterpriseToken < ApplicationRecord
     end
 
     def allows_to?(feature)
-      active_tokens.any? { |token| Authorization::EnterpriseService.new(token).call(feature).result }
+      true
+      #active_tokens.any? { |token| Authorization::EnterpriseService.new(token).call(feature).result }
     end
 
     def active?
-      active_tokens.any?
+      true
+      #active_tokens.any?
     end
 
     def trial_only?
-      active_non_trial_tokens.empty? && active_trial_token.present?
+      false
+      #active_non_trial_tokens.empty? && active_trial_token.present?
     end
 
     def available_features
@@ -78,11 +81,13 @@ class EnterpriseToken < ApplicationRecord
     end
 
     def trialling?(feature)
-      trialling_features.include?(feature)
+      false
+      #trialling_features.include?(feature)
     end
 
     def hide_banners?
-      OpenProject::Configuration.ee_hide_banners?
+      true
+      #OpenProject::Configuration.ee_hide_banners?
     end
 
     def user_limit
@@ -163,24 +168,28 @@ class EnterpriseToken < ApplicationRecord
   end
 
   def allows_to?(action)
-    Authorization::EnterpriseService.new(self).call(action).result
+    true
+    #Authorization::EnterpriseService.new(self).call(action).result
   end
 
   delegate :clear_current_tokens_cache, to: :EnterpriseToken
 
   def expiring_soon?
-    token_object.will_expire? \
-      && token_object.active?(reprieve: false) \
-      && token_object.expires_at <= EXPIRING_SOON_DAYS.days.from_now
+    false
+    #token_object.will_expire? \
+    #  && token_object.active?(reprieve: false) \
+    #  && token_object.expires_at <= EXPIRING_SOON_DAYS.days.from_now
   end
 
   def in_grace_period?
-    token_object.expired?(reprieve: false) \
-      && !token_object.expired?(reprieve: true)
+    false
+    #token_object.expired?(reprieve: false) \
+    #  && !token_object.expired?(reprieve: true)
   end
 
   def expired?(reprieve: true)
-    token_object.expired?(reprieve:)
+    false
+    #token_object.expired?(reprieve:)
   end
 
   def statuses
@@ -206,17 +215,20 @@ class EnterpriseToken < ApplicationRecord
   ##
   # The domain is only validated for tokens from version 2.0 onwards.
   def invalid_domain?
-    return false unless token_object&.validate_domain?
+    false
+    #return false unless token_object&.validate_domain?
 
-    !token_object.valid_domain?(Setting.host_name)
+    #!token_object.valid_domain?(Setting.host_name)
   end
 
   def unlimited_users?
-    max_active_users.nil?
+    true
+    #max_active_users.nil?
   end
 
   def max_active_users
-    Hash(restrictions)[:active_user_count]
+    true
+    #Hash(restrictions)[:active_user_count]
   end
 
   def sort_key
